@@ -5,63 +5,73 @@ import {
   removeFromCart,
   incrementQuantity,
   decrementQuantity,
+  
 } from "../store/cartSlice";
+import { addOrder } from "../store/Orderslice"
+import { useNavigate } from "react-router-dom";
 import appwriteService from "../appwrite/config";
-
+ 
 const Cart = () => {
-  const dispatch = useDispatch();
+  const dispatch  = useDispatch();
+  const navigate  = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
-
+ 
   const subtotal = cartItems.reduce(
     (acc, item) => acc + (Number(item.price) || 0) * (item.quantity || 1),
     0,
   );
-  const fee = subtotal * 0.05;
+  const fee   = subtotal * 0.05;
   const total = subtotal + fee;
-const payNow = async () => {
-
-  const response = await fetch("http://localhost:5000/create-order", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      amount: total,
-    }),
-  });
-
-  const order = await response.json();
-
-  const options = {
-    key: "rzp_test_SmOsP8gPuczQwQ",
-    amount: order.amount,
-    currency: "INR",
-    name: "Farmers Marketplace",
-    description: "Order Payment",
-    order_id: order.id,
-
-    handler: function (response) {
-
-      alert("Payment Successful!");
-
-      console.log(response);
-
-    },
-
-    theme: {
-      color: "#16a34a",
-    },
+ 
+  const payNow = async () => {
+    const response = await fetch("http://localhost:5000/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: total }),
+    });
+ 
+    const order = await response.json();
+ 
+    const options = {
+      key:         "rzp_test_SmOsP8gPuczQwQ",
+      amount:      order.amount,
+      currency:    "INR",
+      name:        "Farmers Marketplace",
+      description: "Order Payment",
+      order_id:    order.id,
+ 
+      handler: function (response) {
+        // ── Save order to Redux store ──
+        dispatch(
+          addOrder({
+            paymentId:  response.razorpay_payment_id,
+            orderedAt:  new Date().toISOString(),
+            items:      cartItems.map((item) => ({
+              post:     item,
+              quantity: item.quantity || 1,
+            })),
+            total: total,
+          }),
+        );
+ 
+        // ── Clear cart after successful payment ──
+        dispatch(clearCart());
+ 
+        // ── Navigate to Orders page ──
+        navigate("/orders");
+      },
+ 
+      theme: { color: "#16a34a" },
+    };
+ 
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
-
-  const rzp = new window.Razorpay(options);
-
-  rzp.open();
-};
-
+ 
   return (
     <div className="container" style={{ padding: "3rem 1.5rem" }}>
       <h1 style={{ marginBottom: "2rem" }}>Your Cart</h1>
-
+ 
       <div className="flex" style={{ gap: "3rem", flexWrap: "wrap" }}>
         <div style={{ flex: "1 1 600px" }}>
           <div
@@ -90,7 +100,8 @@ const payNow = async () => {
                       index !== cartItems.length - 1
                         ? "1px solid var(--color-border)"
                         : "none",
-                    marginBottom: index !== cartItems.length - 1 ? "1.5rem" : 0,
+                    marginBottom:
+                      index !== cartItems.length - 1 ? "1.5rem" : 0,
                     flexWrap: "wrap",
                     gap: "1rem",
                   }}
@@ -116,7 +127,10 @@ const payNow = async () => {
                       >
                         {item.title}
                       </h3>
-                      <p className="text-muted" style={{ fontSize: "0.9rem" }}>
+                      <p
+                        className="text-muted"
+                        style={{ fontSize: "0.9rem" }}
+                      >
                         {item.farmName}
                       </p>
                       <p
@@ -130,6 +144,7 @@ const payNow = async () => {
                       </p>
                     </div>
                   </div>
+ 
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                       <button
@@ -173,7 +188,7 @@ const payNow = async () => {
             )}
           </div>
         </div>
-
+ 
         <div style={{ flex: "1 1 300px" }}>
           <div
             className="glass animate-fade-in-up md:sticky"
@@ -189,7 +204,10 @@ const payNow = async () => {
             </h2>
             <div
               className="flex justify-between"
-              style={{ marginBottom: "1rem", color: "var(--color-text-muted)" }}
+              style={{
+                marginBottom: "1rem",
+                color: "var(--color-text-muted)",
+              }}
             >
               <span>Subtotal</span>
               <span>₹{subtotal.toFixed(2)}</span>
@@ -215,12 +233,13 @@ const payNow = async () => {
               }}
             >
               <span>Total</span>
-              <span className="text-primary">₹{total.toFixed(2)}</span>{" "}
+              <span className="text-primary">₹{total.toFixed(2)}</span>
             </div>
             <button
               className="btn btn-primary"
               style={{ width: "100%", padding: "1rem" }}
               onClick={payNow}
+              disabled={cartItems.length === 0}
             >
               <CreditCard size={20} />
               Proceed to Checkout
@@ -241,5 +260,5 @@ const payNow = async () => {
     </div>
   );
 };
-
+ 
 export default Cart;

@@ -17,6 +17,7 @@ import DashBoard from './pages/DashBoard.jsx'
 import Cart from './pages/Cart.jsx'
 import MarketTable from './pages/MarketPrice.jsx'
 import Setting from './pages/setting.jsx'
+import Order from './pages/Order.jsx'
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
         {
             path: "/setting",
             element: <Setting />,
+        },
+        {
+            path: "/Order",
+            element: <Order/>,
         },
     ],
   },
