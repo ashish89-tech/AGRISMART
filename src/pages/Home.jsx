@@ -198,7 +198,7 @@ function Home() {
         <div className="max-w-7xl mx-auto px-6" style={{ textAlign: "center", marginBottom: 48 }}>
           <div className="section-eyebrow" style={{ display: "inline-flex", marginBottom: 14 }}>
             <span className="section-eyebrow-dot" />
-            Why FarmDirect
+            Why AgriSmart
           </div>
           <h2 className="features-heading">
             Built for <span>Farmers & Families</span>
