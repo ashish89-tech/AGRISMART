@@ -28,7 +28,7 @@ useEffect(()=>{
 },[])
   
 
-return !loading ? (
+return  (
     <div className='min-h-screen flex flex-wrap content-between bg-[#FAFAF8]  '>
       <div className="w-full"> 
          <Header></Header>
@@ -40,6 +40,6 @@ return !loading ? (
        
       </div>
     </div>
-  ) : <div className="flex justify-center items-center min-h-screen bg-gray-600">Loading...</div>;;
+  ) 
 }
 export default App
