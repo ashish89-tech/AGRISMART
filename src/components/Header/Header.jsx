@@ -137,7 +137,9 @@ function Header() {
                           🌾 Dashboard
                         </button>
 
-                  <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-gray-700 transition hover:bg-green-50 hover:text-green-700">
+                  <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-gray-700 transition hover:bg-green-50 hover:text-green-700"
+                  onClick={() => navigate("/order")}
+                  >
                     📦 Orders
                   </button>
 
