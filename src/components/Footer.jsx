@@ -70,7 +70,7 @@ function Footer() {
               <Sprout size={20} color="#0d1a0e" />
             </div>
             <span className="ft-logo-name">
-              Farm<span>Direct</span>
+              Agri<span>Smart</span>
             </span>
           </div>
           <p className="ft-tagline">
